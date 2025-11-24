@@ -5,6 +5,9 @@ use App\Http\Controllers\TweetController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\FollowController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\MediaController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,6 +21,8 @@ use Illuminate\Support\Facades\Route;
 // The Homepage (Global Feed) - Accessible to all (even guests, though actions are protected)
 Route::get('/', [TweetController::class, 'index'])->name('tweets.index');
 
+// Search functionality
+Route::get('/search', [SearchController::class, 'index'])->name('search.index');
 
 // Routes protected by the 'auth' middleware (must be logged in)
 Route::middleware('auth')->group(function () {
@@ -36,6 +41,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/messages', [MessageController::class, 'conversations'])->name('messages.conversations');
     Route::get('/messages/{user}', [MessageController::class, 'show'])->name('messages.show');
     Route::post('/messages/{user}', [MessageController::class, 'store'])->name('messages.store');
+
+    // 5. Follow/Unfollow Routes
+    Route::post('/users/{user}/follow', [FollowController::class, 'store'])->name('follow.store');
+    Route::delete('/users/{user}/follow', [FollowController::class, 'destroy'])->name('follow.destroy');
+
+    // 6. Media Upload Routes
+    Route::post('/tweets/{tweet}/media', [MediaController::class, 'store'])->name('media.store');
+    Route::delete('/media/{media}', [MediaController::class, 'destroy'])->name('media.destroy');
 });
 
 

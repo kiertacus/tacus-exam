@@ -1,4 +1,5 @@
 <x-app-layout>
+    @use('Illuminate\Support\Facades\Storage')
     <div class="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 py-8 relative overflow-hidden">
         <!-- Animated Background Elements -->
         <div class="absolute inset-0 overflow-hidden pointer-events-none">
@@ -140,6 +141,29 @@
                                 <p class="text-gray-800 text-base leading-relaxed relative z-10">{{ $tweet->content }}</p>
                                 <div class="absolute top-0 right-0 text-6xl opacity-5 pointer-events-none">💭</div>
                             </div>
+
+                            <!-- Media Display -->
+                            @if($tweet->media->count() > 0)
+                                <div class="grid grid-cols-2 gap-3 mb-5 rounded-2xl overflow-hidden">
+                                    @foreach($tweet->media as $media)
+                                        @if($media->type === 'image')
+                                            <img 
+                                                src="{{ Storage::url($media->path) }}" 
+                                                alt="Tweet media"
+                                                class="rounded-xl w-full h-auto object-cover max-h-96 hover:scale-105 transition-transform duration-300 cursor-pointer"
+                                            >
+                                        @else
+                                            <video 
+                                                controls 
+                                                class="rounded-xl w-full h-auto max-h-96 bg-black"
+                                            >
+                                                <source src="{{ Storage::url($media->path) }}" type="video/mp4">
+                                                Your browser does not support the video tag.
+                                            </video>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            @endif
 
                             <div class="flex items-center gap-8 text-gray-500 border-t border-gray-200 pt-4">
                                 @auth

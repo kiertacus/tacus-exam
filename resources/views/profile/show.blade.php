@@ -9,16 +9,43 @@
                     </div>
                     <div class="flex-1">
                         <h1 class="text-4xl font-bold text-black">{{ $user->name }}</h1>
+                        <p class="text-gray-600 text-sm mt-1">{{ $user->email }}</p>
                         <div class="mt-4 flex gap-6 items-center">
                             <div class="text-center">
                                 <p class="text-3xl font-bold text-blue-600">{{ $tweets->count() }}</p>
                                 <p class="text-gray-600 text-sm">Tweets</p>
                             </div>
+                            <div class="text-center">
+                                <p class="text-3xl font-bold text-blue-600">{{ $user->following()->count() }}</p>
+                                <p class="text-gray-600 text-sm">Following</p>
+                            </div>
+                            <div class="text-center">
+                                <p class="text-3xl font-bold text-blue-600">{{ $user->followers()->count() }}</p>
+                                <p class="text-gray-600 text-sm">Followers</p>
+                            </div>
                             @auth
                                 @if(auth()->user()->id !== $user->id)
-                                    <a href="{{ route('messages.show', $user) }}" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-2 px-6 rounded-full transition-all transform hover:scale-105">
-                                        💬 Message
-                                    </a>
+                                    <div class="flex gap-2">
+                                        @if(auth()->user()->isFollowing($user))
+                                            <form action="{{ route('follow.destroy', $user) }}" method="POST" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-full transition">
+                                                    Following
+                                                </button>
+                                            </form>
+                                        @else
+                                            <form action="{{ route('follow.store', $user) }}" method="POST" class="inline">
+                                                @csrf
+                                                <button type="submit" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-2 px-6 rounded-full transition-all transform hover:scale-105">
+                                                    Follow
+                                                </button>
+                                            </form>
+                                        @endif
+                                        <a href="{{ route('messages.show', $user) }}" class="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white font-bold py-2 px-6 rounded-full transition-all transform hover:scale-105">
+                                            💬 Message
+                                        </a>
+                                    </div>
                                 @endif
                             @endauth
                         </div>

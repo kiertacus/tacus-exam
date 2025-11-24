@@ -96,4 +96,61 @@ class User extends Authenticatable
         {
             return $this->hasMany(Message::class, 'recipient_id');
         }
+
+        /**
+         * Relationship: A user can have many followers
+         */
+        public function followers()
+        {
+            return $this->hasMany(Follow::class, 'following_id');
+        }
+
+        /**
+         * Relationship: A user can follow many users
+         */
+        public function following()
+        {
+            return $this->hasMany(Follow::class, 'follower_id');
+        }
+
+        /**
+         * Check if this user is following another user
+         */
+        public function isFollowing(User $user)
+        {
+            return $this->following()->where('following_id', $user->id)->exists();
+        }
+
+        /**
+         * Check if this user is followed by another user
+         */
+        public function isFollowedBy(User $user)
+        {
+            return $this->followers()->where('follower_id', $user->id)->exists();
+        }
+
+        /**
+         * Check if users are mutual followers
+         */
+        public function isMutualWith(User $user)
+        {
+            return $this->isFollowing($user) && $this->isFollowedBy($user);
+        }
+
+        /**
+         * Get mutual connections
+         */
+        public function mutuals()
+        {
+            return User::whereIn('id', function ($query) {
+                $query->select('follower_id')
+                    ->from('follows')
+                    ->where('following_id', $this->id);
+            })
+            ->whereIn('id', function ($query) {
+                $query->select('following_id')
+                    ->from('follows')
+                    ->where('follower_id', $this->id);
+            });
+        }
 }
