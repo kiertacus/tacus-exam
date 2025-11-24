@@ -250,6 +250,53 @@
 
                                     <!-- Timestamp -->
                                     <p class="text-xs text-gray-500 uppercase">{{ $tweet->created_at->diffForHumans() }}</p>
+
+                                    <!-- Comments Section -->
+                                    <div class="border-t border-gray-200 pt-4">
+                                        <!-- Comments List -->
+                                        @if($tweet->comments->count() > 0)
+                                            <div class="space-y-3 mb-4 max-h-48 overflow-y-auto">
+                                                @foreach($tweet->comments->take(5) as $comment)
+                                                    <div class="flex gap-2 text-sm">
+                                                        <a href="{{ route('profile.show', $comment->user) }}" class="font-bold text-gray-900 hover:text-blue-600">
+                                                            {{ $comment->user->name }}
+                                                        </a>
+                                                        <p class="text-gray-700">{{ $comment->content }}</p>
+                                                        @can('delete', $comment)
+                                                            <form action="{{ route('comments.destroy', $comment) }}" method="POST" class="ml-auto">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="text-red-600 hover:text-red-800 text-xs" onclick="return confirm('Delete this comment?')">Delete</button>
+                                                            </form>
+                                                        @endcan
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                            @if($tweet->comments->count() > 5)
+                                                <p class="text-xs text-gray-500 mb-4">
+                                                    <a href="#" onclick="alert('Viewing {{ $tweet->comments->count() }} comments')" class="text-blue-600 hover:text-blue-700">
+                                                        View all {{ $tweet->comments->count() }} comments
+                                                    </a>
+                                                </p>
+                                            @endif
+                                        @endif
+
+                                        <!-- Add Comment Form -->
+                                        @auth
+                                            <form action="{{ route('comments.store', $tweet) }}" method="POST" class="flex gap-2">
+                                                @csrf
+                                                <input 
+                                                    type="text"
+                                                    name="content"
+                                                    placeholder="Add a comment..."
+                                                    class="flex-1 border-0 text-sm px-0 py-2 focus:ring-0 placeholder-gray-500"
+                                                >
+                                                <button type="submit" class="text-blue-600 font-bold text-sm hover:text-blue-700">Post</button>
+                                            </form>
+                                        @else
+                                            <p class="text-xs text-gray-500"><a href="{{ route('login') }}" class="text-blue-600 hover:text-blue-700">Sign in</a> to comment</p>
+                                        @endauth
+                                    </div>
                                 </div>
                             </div>
                         @endforeach

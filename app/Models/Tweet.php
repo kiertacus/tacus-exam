@@ -33,6 +33,12 @@ class Tweet extends Model
         return $this->hasMany(Media::class);
     }
 
+    // Relationship: A tweet can have many comments
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
     // Helper: Check if the current user has liked this tweet
     public function isLikedBy(User $user)
     {

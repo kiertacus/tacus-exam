@@ -8,6 +8,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\MediaController;
+use App\Http\Controllers\CommentController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -33,6 +34,10 @@ Route::middleware('auth')->group(function () {
     // 2. Like System Route
     // This route handles both liking and unliking by using the toggle method
     Route::post('/tweets/{tweet}/like', [LikeController::class, 'toggle'])->name('likes.toggle');
+
+    // 2b. Comment Routes
+    Route::post('/tweets/{tweet}/comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
     // 3. User Profile Route (View your own profile, can be extended for others)
     Route::get('/profile/{user}', [UserController::class, 'show'])->name('profile.show');

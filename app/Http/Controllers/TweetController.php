@@ -19,8 +19,8 @@ class TweetController extends Controller
      */
     public function index(): View
     {
-        $tweets = Tweet::with('user', 'media')
-            ->withCount('likes')
+        $tweets = Tweet::with('user', 'media', 'comments.user')
+            ->withCount('likes', 'comments')
             ->latest()
             ->get();
 
