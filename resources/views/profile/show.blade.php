@@ -1,4 +1,5 @@
 <x-app-layout>
+    @use('Illuminate\Support\Facades\Storage')
     <div class="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-blue-50 py-8">
         <div class="container mx-auto max-w-2xl px-4">
             <!-- Profile Header -->
@@ -115,6 +116,29 @@
                                 </div>
 
                                 <p class="text-black mb-6 text-base leading-relaxed">{{ $tweet->content }}</p>
+
+                                <!-- Media Display -->
+                                @if($tweet->media->count() > 0)
+                                    <div class="grid grid-cols-2 gap-3 mb-6 rounded-xl overflow-hidden">
+                                        @foreach($tweet->media as $media)
+                                            @if($media->type === 'image')
+                                                <img 
+                                                    src="{{ Storage::url($media->path) }}" 
+                                                    alt="Tweet media"
+                                                    class="rounded-lg w-full h-auto object-cover max-h-96 hover:scale-105 transition-transform duration-300 cursor-pointer"
+                                                >
+                                            @else
+                                                <video 
+                                                    controls 
+                                                    class="rounded-lg w-full h-auto max-h-96 bg-black"
+                                                >
+                                                    <source src="{{ Storage::url($media->path) }}" type="video/mp4">
+                                                    Your browser does not support the video tag.
+                                                </video>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                @endif
 
                                 <div class="flex items-center gap-6 text-gray-500 border-t border-blue-200 pt-4">
                                     @auth

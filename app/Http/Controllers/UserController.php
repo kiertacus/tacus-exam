@@ -13,7 +13,7 @@ class UserController extends Controller
     public function show(User $user): View
     {
         $tweets = $user->tweets()
-            ->with('user')
+            ->with('user', 'media')
             ->withCount('likes')
             ->latest()
             ->get();
