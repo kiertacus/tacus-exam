@@ -187,62 +187,7 @@
                             </div>
 
                             @auth
-                                <!-- Comments Section -->
-                                <div id="comments-{{ $tweet->id }}" class="hidden mt-6 pt-6 border-t border-gray-200 animate-slideDown">
-                                    <form action="{{ route('comments.store', $tweet) }}" method="POST" class="mb-6">
-                                        @csrf
-                                        <div class="flex gap-3">
-                                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br {{ auth()->user()->getAvatarColors() }} flex items-center justify-center text-white font-bold shadow-lg flex-shrink-0">
-                                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                                            </div>
-                                            <div class="flex-1">
-                                                <textarea 
-                                                    name="content" 
-                                                    placeholder="Write a comment... 💭" 
-                                                    rows="2"
-                                                    class="w-full p-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-200 resize-none transition-all duration-300 text-sm"
-                                                    required
-                                                ></textarea>
-                                                <button type="submit" class="mt-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-2 px-6 rounded-full hover:scale-105 transition-transform duration-300 shadow-lg text-sm">
-                                                    Post Comment
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </form>
-
-                                    <!-- Comments List -->
-                                    <div class="space-y-4">
-                                        @foreach ($tweet->comments as $comment)
-                                            <div class="flex gap-3 bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition-colors duration-300">
-                                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br {{ $comment->user->getAvatarColors() }} flex items-center justify-center text-white font-bold shadow-md flex-shrink-0">
-                                                    {{ strtoupper(substr($comment->user->name, 0, 1)) }}
-                                                </div>
-                                                <div class="flex-1">
-                                                    <div class="flex items-center justify-between mb-1">
-                                                        <p class="font-bold text-gray-800 text-sm">{{ $comment->user->name }}</p>
-                                                        <span class="text-xs text-gray-500">{{ $comment->created_at->diffForHumans() }}</span>
-                                                    </div>
-                                                    <p class="text-gray-700 text-sm">{{ $comment->content }}</p>
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-
-                                <!-- Share Modal -->
-                                <div id="share-{{ $tweet->id }}" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center animate-fadeIn" onclick="closeModal('share-{{ $tweet->id }}')">
-                                    <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full mx-4 transform scale-95 animate-scaleIn" onclick="event.stopPropagation()">
-                                        <div class="flex justify-between items-center mb-6">
-                                            <h3 class="text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Share Tweet</h3>
-                                            <button onclick="closeModal('share-{{ $tweet->id }}')" class="text-gray-400 hover:text-gray-600 text-2xl hover:rotate-90 transition-transform duration-300">×</button>
-                                        </div>
-                                        <div class="space-y-3">
-                                            <button onclick="copyToClipboard('{{ route('tweets.show', $tweet) }}')" class="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 rounded-2xl transition-all duration-300 group">
-                                                <span class="text-3xl group-hover:scale-110 transition-transform">🔗</span>
-                                                <div class="text-left">
-                                                    <p class="font-bold text-gray-800">Copy Link</p>
-                                                    <p class="text-xs text-gray-600">Share link to this tweet</p>
-                                                </div>
+                            @endauth
                                             </button>
                                             <button onclick="shareVia('twitter', '{{ $tweet->content }}')" class="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 rounded-2xl transition-all duration-300 group">
                                                 <span class="text-3xl group-hover:scale-110 transition-transform">🐦</span>
