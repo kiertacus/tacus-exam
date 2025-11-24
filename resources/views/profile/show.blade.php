@@ -1,5 +1,6 @@
+@use('Illuminate\Support\Facades\Storage')
+
 <x-app-layout>
-    @use('Illuminate\Support\Facades\Storage')
     <div class="min-h-screen bg-gradient-to-br from-blue-50 via-blue-100 to-blue-50 py-8">
         <div class="container mx-auto max-w-2xl px-4">
             <!-- Profile Header -->

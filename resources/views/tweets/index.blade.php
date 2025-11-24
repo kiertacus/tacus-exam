@@ -1,5 +1,6 @@
+@use('Illuminate\Support\Facades\Storage')
+
 <x-app-layout>
-    @use('Illuminate\Support\Facades\Storage')
     <div class="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 py-8 relative overflow-hidden">
         <!-- Animated Background Elements -->
         <div class="absolute inset-0 overflow-hidden pointer-events-none">
