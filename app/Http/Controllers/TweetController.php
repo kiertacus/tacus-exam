@@ -34,11 +34,40 @@ class TweetController extends Controller
     {
         $validated = $request->validate([
             'content' => ['required', 'string', 'max:280'],
+            'media' => ['nullable', 'file', 'mimes:jpg,jpeg,png,gif,mp4,mov,avi', 'max:51200'],
         ]);
 
-        $request->user()->tweets()->create($validated);
+        $tweet = $request->user()->tweets()->create([
+            'content' => $validated['content'],
+        ]);
+
+        // Handle media upload if provided
+        if ($request->hasFile('media')) {
+            $file = $request->file('media');
+            $type = $this->getMediaType($file->getMimeType());
+            $path = $file->store('tweets', 'public');
+
+            $tweet->media()->create([
+                'path' => $path,
+                'type' => $type,
+            ]);
+        }
 
         return redirect()->route('tweets.index')->with('status', 'Tweet created successfully!');
+    }
+
+    /**
+     * Determine media type from MIME type
+     */
+    private function getMediaType(string $mimeType): string
+    {
+        if (str_starts_with($mimeType, 'image/')) {
+            return 'image';
+        } elseif (str_starts_with($mimeType, 'video/')) {
+            return 'video';
+        }
+
+        return 'image';
     }
 
     /**

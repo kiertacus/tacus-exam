@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tweet;
+use App\Models\Media;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -13,7 +14,10 @@ class MediaController extends Controller
      */
     public function store(Request $request, Tweet $tweet)
     {
-        $this->authorize('create', $tweet);
+        // Check authorization
+        if (auth()->user()->id !== $tweet->user_id) {
+            return back()->with('error', 'Unauthorized');
+        }
 
         $request->validate([
             'media' => 'required|file|mimes:jpg,jpeg,png,gif,mp4,mov,avi|max:51200',
@@ -34,12 +38,14 @@ class MediaController extends Controller
     /**
      * Delete a media file
      */
-    public function destroy($mediaId)
+    public function destroy(Media $media)
     {
-        $media = \App\Models\Media::find($mediaId);
         $tweet = $media->tweet;
 
-        $this->authorize('delete', $tweet);
+        // Check authorization
+        if (auth()->user()->id !== $tweet->user_id) {
+            return back()->with('error', 'Unauthorized');
+        }
 
         // Delete file from storage
         Storage::disk('public')->delete($media->path);
