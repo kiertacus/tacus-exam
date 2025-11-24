@@ -257,7 +257,16 @@
                                     <div>
                                         <p class="text-gray-900">
                                             <a href="{{ route('profile.show', $tweet->user) }}" class="font-bold hover:text-blue-600">{{ $tweet->user->name }}</a>
-                                            <span class="ml-2">{{ $tweet->content }}</span>
+                                            <span class="ml-2">
+                                                {!! preg_replace_callback(
+                                                    '/(#\w+)/i',
+                                                    function($matches) {
+                                                        $tag = $matches[1];
+                                                        return '<a href="' . route('hashtags.show', ['tag' => substr($tag, 1)]) . '" class="text-blue-600 hover:text-blue-700">' . $tag . '</a>';
+                                                    },
+                                                    $tweet->content
+                                                ) !!}
+                                            </span>
                                         </p>
                                     </div>
 

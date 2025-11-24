@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tweet;
+use App\Models\Hashtag;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -55,7 +56,41 @@ class TweetController extends Controller
             }
         }
 
+        // Parse and attach hashtags
+        $this->attachHashtags($tweet, $validated['content']);
+
         return redirect()->route('tweets.index')->with('status', 'Tweet created successfully!');
+    }
+
+    /**
+     * Parse hashtags from content and attach them to tweet.
+     */
+    private function attachHashtags(Tweet $tweet, string $content): void
+    {
+        // Find all hashtags (words starting with #)
+        preg_match_all('/#(\w+)/', $content, $matches);
+        
+        if (!empty($matches[1])) {
+            $hashtagIds = [];
+            foreach ($matches[1] as $tag) {
+                $tag = strtolower($tag);
+                
+                // Create or get hashtag
+                $hashtag = Hashtag::firstOrCreate(
+                    ['name' => $tag],
+                    ['count' => 0]
+                );
+                
+                // Attach to tweet
+                $hashtagIds[] = $hashtag->id;
+                
+                // Increment count
+                $hashtag->increment('count');
+            }
+            
+            // Attach all hashtags to tweet
+            $tweet->hashtags()->attach($hashtagIds);
+        }
     }
 
     /**

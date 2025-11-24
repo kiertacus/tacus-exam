@@ -10,6 +10,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\HashtagController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,6 +26,9 @@ Route::get('/', [TweetController::class, 'index'])->name('tweets.index');
 
 // Search functionality
 Route::get('/search', [SearchController::class, 'index'])->name('search.index');
+
+// Hashtag functionality
+Route::get('/hashtag/{tag}', [HashtagController::class, 'show'])->name('hashtags.show');
 
 // Routes protected by the 'auth' middleware (must be logged in)
 Route::middleware('auth')->group(function () {

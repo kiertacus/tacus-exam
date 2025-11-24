@@ -39,6 +39,12 @@ class Tweet extends Model
         return $this->hasMany(Comment::class);
     }
 
+    // Relationship: A tweet can have many hashtags
+    public function hashtags()
+    {
+        return $this->belongsToMany(Hashtag::class, 'hashtag_tweet');
+    }
+
     // Helper: Check if the current user has liked this tweet
     public function isLikedBy(User $user)
     {
