@@ -11,7 +11,7 @@ class TweetController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('auth')->except('index');
     }
 
     /**
@@ -34,23 +34,25 @@ class TweetController extends Controller
     {
         $validated = $request->validate([
             'content' => ['required', 'string', 'max:280'],
-            'media' => ['nullable', 'file', 'mimes:jpg,jpeg,png,gif,mp4,mov,avi', 'max:51200'],
+            'media' => ['nullable', 'array'],
+            'media.*' => ['file', 'mimes:jpg,jpeg,png,gif,mp4,mov,avi,webm', 'max:51200'],
         ]);
 
         $tweet = $request->user()->tweets()->create([
             'content' => $validated['content'],
         ]);
 
-        // Handle media upload if provided
+        // Handle media uploads if provided
         if ($request->hasFile('media')) {
-            $file = $request->file('media');
-            $type = $this->getMediaType($file->getMimeType());
-            $path = $file->store('tweets', 'public');
+            foreach ($request->file('media') as $file) {
+                $type = $this->getMediaType($file->getMimeType());
+                $path = $file->store('tweets', 'public');
 
-            $tweet->media()->create([
-                'path' => $path,
-                'type' => $type,
-            ]);
+                $tweet->media()->create([
+                    'path' => $path,
+                    'type' => $type,
+                ]);
+            }
         }
 
         return redirect()->route('tweets.index')->with('status', 'Tweet created successfully!');

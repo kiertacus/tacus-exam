@@ -81,12 +81,70 @@
                     </div>
                 </div>
 
-                <!-- Create Post Form -->
-                @if($tweets->isEmpty() && auth()->check())
+                <!-- Create Post Form (Always Show for Auth) -->
+                @auth
                     <div class="p-4 bg-white border-b border-gray-200">
-                        <x-create-tweet-form />
+                        <div class="flex gap-4">
+                            <!-- Avatar -->
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-br {{ auth()->user()->getAvatarColors() }} flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                            </div>
+                            
+                            <!-- Form -->
+                            <form action="{{ route('tweets.store') }}" method="POST" enctype="multipart/form-data" class="flex-1" id="create-tweet-form">
+                                @csrf
+                                <div class="space-y-3">
+                                    <!-- Textarea -->
+                                    <textarea
+                                        name="content"
+                                        placeholder="What's on your mind?"
+                                        maxlength="280"
+                                        class="w-full border-0 outline-none text-lg placeholder-gray-500 resize-none focus:ring-0"
+                                        rows="3"
+                                    ></textarea>
+
+                                    <!-- Media Upload Preview -->
+                                    <div id="media-preview" class="hidden">
+                                        <div class="grid grid-cols-3 gap-2" id="preview-grid"></div>
+                                    </div>
+
+                                    <!-- Actions -->
+                                    <div class="flex items-center justify-between pt-2 border-t border-gray-200">
+                                        <div class="flex gap-2">
+                                            <!-- Image Upload -->
+                                            <label class="cursor-pointer hover:bg-gray-100 p-2 rounded transition">
+                                                <svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"></path></svg>
+                                                <input type="file" name="media[]" accept="image/*,video/*" multiple hidden id="media-input" onchange="previewMedia()">
+                                            </label>
+                                        </div>
+
+                                        <!-- Submit Button -->
+                                        <button
+                                            type="submit"
+                                            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full transition disabled:opacity-50"
+                                            id="submit-btn"
+                                        >
+                                            Post
+                                        </button>
+                                    </div>
+
+                                    <!-- Character Count -->
+                                    <div class="text-xs text-gray-500 text-right">
+                                        <span id="char-count">0</span>/280
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                @endif
+                @else
+                    <!-- Not Logged In -->
+                    <div class="p-8 bg-white border-b border-gray-200 text-center">
+                        <p class="text-gray-600 mb-4">Sign in to post and connect with others</p>
+                        <a href="{{ route('login') }}" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full">
+                            Sign In
+                        </a>
+                    </div>
+                @endauth
 
                 <!-- Feed Posts -->
                 <div>
@@ -279,6 +337,51 @@
                 });
             }
         });
+
+        // Character counter
+        const textarea = document.querySelector('textarea[name="content"]');
+        const charCount = document.getElementById('char-count');
+        const submitBtn = document.getElementById('submit-btn');
+
+        if (textarea) {
+            textarea.addEventListener('input', function() {
+                charCount.textContent = this.value.length;
+                submitBtn.disabled = this.value.length === 0 && document.getElementById('media-input').files.length === 0;
+            });
+        }
+
+        // Media preview
+        function previewMedia() {
+            const input = document.getElementById('media-input');
+            const preview = document.getElementById('media-preview');
+            const previewGrid = document.getElementById('preview-grid');
+            
+            previewGrid.innerHTML = '';
+            
+            if (input.files.length > 0) {
+                preview.classList.remove('hidden');
+                Array.from(input.files).forEach((file, index) => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const div = document.createElement('div');
+                        div.className = 'relative bg-gray-100 rounded aspect-square overflow-hidden';
+                        
+                        if (file.type.startsWith('image/')) {
+                            div.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
+                        } else {
+                            div.innerHTML = `<video src="${e.target.result}" class="w-full h-full object-cover"></video>`;
+                        }
+                        
+                        previewGrid.appendChild(div);
+                    };
+                    reader.readAsDataURL(file);
+                });
+                submitBtn.disabled = false;
+            } else {
+                preview.classList.add('hidden');
+                submitBtn.disabled = textarea.value.length === 0;
+            }
+        }
     </script>
 
     <style>
