@@ -111,19 +111,27 @@
                                 </div>
                                 
                                 @can('update', $tweet)
-                                    <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0">
-                                        <a href="{{ route('tweets.edit', $tweet) }}" class="text-blue-600 hover:text-blue-700 hover:bg-blue-100 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-1 hover:scale-105">
-                                            <span>✏️</span>
-                                            <span>Edit</span>
-                                        </a>
-                                        <form action="{{ route('tweets.destroy', $tweet) }}" method="POST" class="inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-700 hover:bg-red-100 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-1 hover:scale-105" onclick="return confirm('Delete this tweet?')">
-                                                <span>🗑️</span>
-                                                <span>Delete</span>
-                                            </button>
-                                        </form>
+                                    <div class="relative">
+                                        <button type="button" 
+                                                onclick="toggleMenu('menu-{{ $tweet->id }}')" 
+                                                class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 px-3 py-2 rounded-xl transition-all duration-300 transform hover:scale-105">
+                                            <span class="text-xl">⋯</span>
+                                        </button>
+                                        <!-- Dropdown Menu -->
+                                        <div id="menu-{{ $tweet->id }}" class="hidden absolute right-0 top-12 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-20 min-w-[180px] animate-slideDown">
+                                            <a href="{{ route('tweets.edit', $tweet) }}" class="flex items-center gap-3 px-5 py-3 text-blue-600 hover:bg-blue-50 transition-colors duration-200 font-medium">
+                                                <span class="text-lg">✏️</span>
+                                                <span>Edit Tweet</span>
+                                            </a>
+                                            <form action="{{ route('tweets.destroy', $tweet) }}" method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="w-full flex items-center gap-3 px-5 py-3 text-red-600 hover:bg-red-50 transition-colors duration-200 font-medium border-t border-gray-100" onclick="return confirm('Delete this tweet?')">
+                                                    <span class="text-lg">🗑️</span>
+                                                    <span>Delete Tweet</span>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
                                 @endcan
                             </div>
@@ -135,6 +143,7 @@
 
                             <div class="flex items-center gap-8 text-gray-500 border-t border-gray-200 pt-4">
                                 @auth
+                                    <!-- Like Button -->
                                     <form action="{{ route('likes.toggle', $tweet) }}" method="POST" class="flex items-center gap-3 group/like cursor-pointer">
                                         @csrf
                                         <button type="submit" class="relative group-hover/like:scale-125 transition-all duration-300 transform">
@@ -143,31 +152,116 @@
                                             @else
                                                 <span class="text-3xl group-hover/like:text-red-500 transition-colors duration-300">🤍</span>
                                             @endif
-                                            <!-- Ripple Effect on Click -->
                                             <span class="absolute inset-0 rounded-full bg-red-400 opacity-0 group-hover/like:opacity-20 group-hover/like:scale-150 transition-all duration-500"></span>
                                         </button>
                                         <span class="font-bold text-lg text-gray-700 group-hover/like:text-red-500 group-hover/like:scale-110 transition-all duration-300">
                                             {{ $tweet->likes_count }}
                                         </span>
                                     </form>
+
+                                    <!-- Comment Button -->
+                                    <button onclick="toggleComments('comments-{{ $tweet->id }}')" class="flex items-center gap-3 cursor-pointer hover:text-blue-500 transition-colors duration-300 group/comment">
+                                        <span class="text-2xl group-hover/comment:scale-110 transition-transform">💬</span>
+                                        <span class="font-semibold">Comment</span>
+                                    </button>
+
+                                    <!-- Share Button -->
+                                    <button onclick="shareModal('share-{{ $tweet->id }}')" class="flex items-center gap-3 cursor-pointer hover:text-green-500 transition-colors duration-300 group/share ml-auto">
+                                        <span class="text-2xl group-hover/share:scale-110 group-hover/share:rotate-12 transition-all">🔄</span>
+                                        <span class="font-semibold">Share</span>
+                                    </button>
                                 @else
                                     <div class="flex items-center gap-3 cursor-not-allowed opacity-60">
                                         <span class="text-3xl">🤍</span>
                                         <span class="font-bold text-lg text-gray-700">{{ $tweet->likes_count }}</span>
                                     </div>
+                                    <div class="flex items-center gap-3 cursor-not-allowed opacity-60">
+                                        <span class="text-2xl">💬</span>
+                                        <span class="font-semibold">Comment</span>
+                                    </div>
+                                    <div class="flex items-center gap-3 cursor-not-allowed opacity-60 ml-auto">
+                                        <span class="text-2xl">🔄</span>
+                                        <span class="font-semibold">Share</span>
+                                    </div>
                                 @endauth
-
-                                <!-- Additional Interactions -->
-                                <div class="flex items-center gap-3 cursor-pointer hover:text-blue-500 transition-colors duration-300 group/comment">
-                                    <span class="text-2xl group-hover/comment:scale-110 transition-transform">💬</span>
-                                    <span class="font-semibold">Reply</span>
-                                </div>
-
-                                <div class="flex items-center gap-3 cursor-pointer hover:text-green-500 transition-colors duration-300 group/share ml-auto">
-                                    <span class="text-2xl group-hover/share:scale-110 group-hover/share:rotate-12 transition-all">🔄</span>
-                                    <span class="font-semibold">Share</span>
-                                </div>
                             </div>
+
+                            @auth
+                                <!-- Comments Section -->
+                                <div id="comments-{{ $tweet->id }}" class="hidden mt-6 pt-6 border-t border-gray-200 animate-slideDown">
+                                    <form action="{{ route('comments.store', $tweet) }}" method="POST" class="mb-6">
+                                        @csrf
+                                        <div class="flex gap-3">
+                                            <div class="w-10 h-10 rounded-xl bg-gradient-to-br {{ auth()->user()->getAvatarColors() }} flex items-center justify-center text-white font-bold shadow-lg flex-shrink-0">
+                                                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                            </div>
+                                            <div class="flex-1">
+                                                <textarea 
+                                                    name="content" 
+                                                    placeholder="Write a comment... 💭" 
+                                                    rows="2"
+                                                    class="w-full p-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-200 resize-none transition-all duration-300 text-sm"
+                                                    required
+                                                ></textarea>
+                                                <button type="submit" class="mt-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold py-2 px-6 rounded-full hover:scale-105 transition-transform duration-300 shadow-lg text-sm">
+                                                    Post Comment
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+
+                                    <!-- Comments List -->
+                                    <div class="space-y-4">
+                                        @foreach ($tweet->comments as $comment)
+                                            <div class="flex gap-3 bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition-colors duration-300">
+                                                <div class="w-10 h-10 rounded-xl bg-gradient-to-br {{ $comment->user->getAvatarColors() }} flex items-center justify-center text-white font-bold shadow-md flex-shrink-0">
+                                                    {{ strtoupper(substr($comment->user->name, 0, 1)) }}
+                                                </div>
+                                                <div class="flex-1">
+                                                    <div class="flex items-center justify-between mb-1">
+                                                        <p class="font-bold text-gray-800 text-sm">{{ $comment->user->name }}</p>
+                                                        <span class="text-xs text-gray-500">{{ $comment->created_at->diffForHumans() }}</span>
+                                                    </div>
+                                                    <p class="text-gray-700 text-sm">{{ $comment->content }}</p>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                <!-- Share Modal -->
+                                <div id="share-{{ $tweet->id }}" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center animate-fadeIn" onclick="closeModal('share-{{ $tweet->id }}')">
+                                    <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full mx-4 transform scale-95 animate-scaleIn" onclick="event.stopPropagation()">
+                                        <div class="flex justify-between items-center mb-6">
+                                            <h3 class="text-2xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Share Tweet</h3>
+                                            <button onclick="closeModal('share-{{ $tweet->id }}')" class="text-gray-400 hover:text-gray-600 text-2xl hover:rotate-90 transition-transform duration-300">×</button>
+                                        </div>
+                                        <div class="space-y-3">
+                                            <button onclick="copyToClipboard('{{ route('tweets.show', $tweet) }}')" class="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 hover:from-blue-100 hover:to-purple-100 rounded-2xl transition-all duration-300 group">
+                                                <span class="text-3xl group-hover:scale-110 transition-transform">🔗</span>
+                                                <div class="text-left">
+                                                    <p class="font-bold text-gray-800">Copy Link</p>
+                                                    <p class="text-xs text-gray-600">Share link to this tweet</p>
+                                                </div>
+                                            </button>
+                                            <button onclick="shareVia('twitter', '{{ $tweet->content }}')" class="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 rounded-2xl transition-all duration-300 group">
+                                                <span class="text-3xl group-hover:scale-110 transition-transform">🐦</span>
+                                                <div class="text-left">
+                                                    <p class="font-bold text-gray-800">Share on Twitter</p>
+                                                    <p class="text-xs text-gray-600">Post to your timeline</p>
+                                                </div>
+                                            </button>
+                                            <button onclick="shareVia('facebook', '{{ $tweet->content }}')" class="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-indigo-50 to-indigo-100 hover:from-indigo-100 hover:to-indigo-200 rounded-2xl transition-all duration-300 group">
+                                                <span class="text-3xl group-hover:scale-110 transition-transform">📘</span>
+                                                <div class="text-left">
+                                                    <p class="font-bold text-gray-800">Share on Facebook</p>
+                                                    <p class="text-xs text-gray-600">Post to your feed</p>
+                                                </div>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endauth
                         </div>
                     @endforeach
                 @endif
