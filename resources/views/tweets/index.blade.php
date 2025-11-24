@@ -1,311 +1,313 @@
 @use('Illuminate\Support\Facades\Storage')
 
 <x-app-layout>
-    <div class="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-100 py-8 relative overflow-hidden">
-        <!-- Animated Background Elements -->
-        <div class="absolute inset-0 overflow-hidden pointer-events-none">
-            <div class="absolute top-20 left-10 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
-            <div class="absolute top-40 right-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
-            <div class="absolute -bottom-8 left-40 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
-        </div>
+    <div class="min-h-screen bg-white">
+        <div class="flex h-screen">
+            <!-- Left Sidebar (Desktop Only) -->
+            <div class="hidden lg:flex w-64 bg-white border-r border-gray-200 flex-col fixed left-0 top-0 h-screen">
+                <!-- Logo -->
+                <div class="p-6 border-b border-gray-200">
+                    <a href="{{ route('tweets.index') }}" class="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 text-transparent bg-clip-text">
+                        Chirper
+                    </a>
+                </div>
 
-        <div class="container mx-auto max-w-2xl px-4 relative z-10">
-            <!-- Create Tweet Section -->
-            <x-create-tweet-form />
+                <!-- Navigation Menu -->
+                <nav class="flex-1 px-4 py-6 space-y-4">
+                    <a href="{{ route('tweets.index') }}" class="flex items-center gap-4 px-4 py-3 rounded-full text-2xl {{ request()->routeIs('tweets.index') ? 'font-bold' : 'text-gray-700 hover:bg-gray-100' }}">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M3 13h2v8H3zm4-8h2v16H7zm4-2h2v18h-2zm4 4h2v14h-2zm4-1h2v15h-2z"></path></svg>
+                        <span class="hidden xl:block">Feed</span>
+                    </a>
 
-            <!-- Tweets Feed -->
-            <div class="space-y-6">
-                @if ($tweets->isEmpty())
-                    <div class="bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl p-16 text-center border border-white/50 animate-fadeInUp">
-                        <div class="text-7xl mb-4 animate-bounce">📝</div>
-                        <p class="text-gray-600 text-xl font-semibold mb-2">No tweets yet</p>
-                        <p class="text-gray-500">Be the first to share something amazing!</p>
+                    <a href="{{ route('search.index') }}" class="flex items-center gap-4 px-4 py-3 rounded-full text-2xl {{ request()->routeIs('search.index') ? 'font-bold' : 'text-gray-700 hover:bg-gray-100' }}">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M15.5 1h-8C6.12 1 5 2.12 5 3.5v17C5 21.88 6.12 23 7.5 23h8c1.38 0 2.5-1.12 2.5-2.5v-17C18 2.12 16.88 1 15.5 1zm-4 21c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4.5-4H7V4h9v14z"></path></svg>
+                        <span class="hidden xl:block">Explore</span>
+                    </a>
+
+                    <a href="{{ route('messages.conversations') }}" class="flex items-center gap-4 px-4 py-3 rounded-full text-2xl {{ request()->routeIs('messages.*') ? 'font-bold' : 'text-gray-700 hover:bg-gray-100' }}">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"></path></svg>
+                        <span class="hidden xl:block">Messages</span>
+                    </a>
+
+                    <a href="{{ route('profile.edit') }}" class="flex items-center gap-4 px-4 py-3 rounded-full text-2xl text-gray-700 hover:bg-gray-100">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg>
+                        <span class="hidden xl:block">Profile</span>
+                    </a>
+                </nav>
+
+                <!-- Logout -->
+                <div class="p-4 border-t border-gray-200">
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="w-full flex items-center gap-4 px-4 py-3 rounded-full text-gray-700 hover:bg-gray-100 text-2xl">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 5H5v12h14V6z"></path></svg>
+                            <span class="hidden xl:block">Logout</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Main Feed -->
+            <div class="flex-1 lg:ml-64 max-w-2xl mx-auto w-full border-r border-gray-200 min-h-screen">
+                <!-- Stories Section (Instagram Style) -->
+                <div class="border-b border-gray-200 bg-white sticky top-0 z-40">
+                    <div class="p-4 overflow-x-auto">
+                        <div class="flex gap-4">
+                            @auth
+                                <!-- Your Story -->
+                                <a href="{{ route('profile.edit') }}" class="flex flex-col items-center gap-2 group cursor-pointer">
+                                    <div class="w-16 h-16 rounded-full bg-gradient-to-br {{ auth()->user()->getAvatarColors() }} p-1 border-2 border-gray-300 group-hover:border-blue-500 transition">
+                                        <div class="w-full h-full rounded-full bg-white flex items-center justify-center">
+                                            <span class="text-2xl">+</span>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs text-center">Your Story</span>
+                                </a>
+                            @endauth
+
+                            <!-- Other Users Stories (Suggested) -->
+                            @php
+                                $suggestedUsers = \App\Models\User::inRandomOrder()->where('id', '!=', auth()->id())->limit(15)->get();
+                            @endphp
+                            @foreach($suggestedUsers->take(10) as $user)
+                                <a href="{{ route('profile.show', $user) }}" class="flex flex-col items-center gap-2 group cursor-pointer">
+                                    <div class="w-16 h-16 rounded-full bg-gradient-to-br {{ $user->getAvatarColors() }} flex items-center justify-center text-white font-bold text-xl border-2 border-gray-300 group-hover:border-blue-500 transition">
+                                        {{ strtoupper(substr($user->name, 0, 1)) }}
+                                    </div>
+                                    <span class="text-xs text-center truncate w-16">{{ explode(' ', $user->name)[0] }}</span>
+                                </a>
+                            @endforeach
+                        </div>
                     </div>
-                @else
-                    @foreach ($tweets as $tweet)
-                        <div class="bg-white/90 backdrop-blur-lg rounded-3xl shadow-xl p-6 border border-white/50 hover:border-purple-300 transition-all duration-500 transform hover:scale-[1.02] hover:-translate-y-2 group animate-fadeInUp" style="animation-delay: {{ $loop->index * 0.1 }}s">
-                            <div class="flex justify-between items-start mb-5">
-                                <div class="flex-1">
-                                    <a href="{{ route('profile.show', $tweet->user) }}" class="inline-block">
-                                        <div class="flex items-center gap-4">
-                                            <!-- Enhanced Avatar with Multiple Styles -->
-                                            <div class="relative">
-                                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br {{ $tweet->user->getAvatarColors() }} flex items-center justify-center text-white font-bold text-xl shadow-lg group-hover:shadow-2xl transition-all duration-300 transform group-hover:scale-110 group-hover:rotate-3 relative overflow-hidden">
-                                                    <!-- Avatar Letter -->
-                                                    <span class="relative z-10">{{ strtoupper(substr($tweet->user->name, 0, 1)) }}</span>
-                                                    <!-- Shine Effect -->
-                                                    <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                                                </div>
-                                                <!-- Status Indicator -->
-                                                <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-400 border-3 border-white rounded-full animate-pulse"></div>
-                                            </div>
-                                            <div>
-                                                <p class="font-bold text-gray-800 text-lg group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 group-hover:bg-clip-text transition-all duration-300">{{ $tweet->user->name }}</p>
-                                                <p class="text-gray-500 text-sm flex items-center gap-2">
-                                                    <span>{{ $tweet->created_at->diffForHumans() }}</span>
-                                                    <span class="w-1 h-1 bg-gray-400 rounded-full"></span>
-                                                    <span class="text-xs">🌍</span>
-                                                </p>
-                                            </div>
+                </div>
+
+                <!-- Create Post Form -->
+                @if($tweets->isEmpty() && auth()->check())
+                    <div class="p-4 bg-white border-b border-gray-200">
+                        <x-create-tweet-form />
+                    </div>
+                @endif
+
+                <!-- Feed Posts -->
+                <div>
+                    @if ($tweets->isEmpty())
+                        <div class="p-12 text-center">
+                            <div class="text-6xl mb-4">📸</div>
+                            <p class="text-gray-600 text-lg font-semibold mb-2">No posts yet</p>
+                            <p class="text-gray-500">Start following people to see their posts here</p>
+                        </div>
+                    @else
+                        @foreach ($tweets as $tweet)
+                            <!-- Post Card (Instagram Style) -->
+                            <div class="border-b border-gray-200 bg-white">
+                                <!-- Post Header -->
+                                <div class="p-4 flex items-center justify-between">
+                                    <a href="{{ route('profile.show', $tweet->user) }}" class="flex items-center gap-3 flex-1 group">
+                                        <div class="w-10 h-10 rounded-full bg-gradient-to-br {{ $tweet->user->getAvatarColors() }} flex items-center justify-center text-white font-bold text-sm">
+                                            {{ strtoupper(substr($tweet->user->name, 0, 1)) }}
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-gray-900 group-hover:text-blue-600">{{ $tweet->user->name }}</p>
+                                            <p class="text-xs text-gray-500">{{ $tweet->created_at->diffForHumans() }}</p>
                                         </div>
                                     </a>
-                                </div>
-                                
-                                @can('update', $tweet)
-                                    <div class="relative">
-                                        <button type="button" 
-                                                onclick="toggleMenu('menu-{{ $tweet->id }}')" 
-                                                class="text-gray-400 hover:text-gray-600 hover:bg-gray-100 px-3 py-2 rounded-xl transition-all duration-300 transform hover:scale-105">
-                                            <span class="text-xl">⋯</span>
+
+                                    @can('update', $tweet)
+                                        <button type="button" onclick="toggleMenu('menu-{{ $tweet->id }}')" class="text-gray-500 hover:text-gray-900">
+                                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path></svg>
                                         </button>
-                                        <!-- Dropdown Menu -->
-                                        <div id="menu-{{ $tweet->id }}" class="hidden absolute right-0 top-12 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden z-20 min-w-[180px] animate-slideDown">
-                                            <a href="{{ route('tweets.edit', $tweet) }}" class="flex items-center gap-3 px-5 py-3 text-blue-600 hover:bg-blue-50 transition-colors duration-200 font-medium">
-                                                <span class="text-lg">✏️</span>
-                                                <span>Edit Tweet</span>
-                                            </a>
+                                        <div id="menu-{{ $tweet->id }}" class="hidden absolute right-4 mt-8 bg-white rounded-lg shadow-lg border border-gray-200 z-20">
+                                            <a href="{{ route('tweets.edit', $tweet) }}" class="block px-4 py-2 text-blue-600 hover:bg-gray-100 rounded-t-lg">Edit</a>
                                             <form action="{{ route('tweets.destroy', $tweet) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="w-full flex items-center gap-3 px-5 py-3 text-red-600 hover:bg-red-50 transition-colors duration-200 font-medium border-t border-gray-100" onclick="return confirm('Delete this tweet?')">
-                                                    <span class="text-lg">🗑️</span>
-                                                    <span>Delete Tweet</span>
-                                                </button>
+                                                <button type="submit" class="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 rounded-b-lg" onclick="return confirm('Delete this post?')">Delete</button>
                                             </form>
                                         </div>
+                                    @endcan
+                                </div>
+
+                                <!-- Post Image/Video -->
+                                @if($tweet->media->count() > 0)
+                                    <div class="bg-black">
+                                        @foreach($tweet->media as $media)
+                                            @if($media->type === 'image')
+                                                <img 
+                                                    src="{{ Storage::url($media->path) }}" 
+                                                    alt="Post"
+                                                    class="w-full aspect-square object-cover"
+                                                >
+                                            @else
+                                                <video 
+                                                    controls 
+                                                    class="w-full aspect-square object-cover"
+                                                >
+                                                    <source src="{{ Storage::url($media->path) }}" type="video/mp4">
+                                                </video>
+                                            @endif
+                                        @endforeach
                                     </div>
-                                @endcan
-                            </div>
+                                @endif
 
-                            <div class="bg-gradient-to-br from-gray-50 to-blue-50/30 rounded-2xl p-5 mb-5 relative overflow-hidden">
-                                <p class="text-gray-800 text-base leading-relaxed relative z-10">{{ $tweet->content }}</p>
-                                <div class="absolute top-0 right-0 text-6xl opacity-5 pointer-events-none">💭</div>
-                            </div>
-
-                            <!-- Media Display -->
-                            @if($tweet->media->count() > 0)
-                                <div class="grid grid-cols-2 gap-3 mb-5 rounded-2xl overflow-hidden">
-                                    @foreach($tweet->media as $media)
-                                        @if($media->type === 'image')
-                                            <img 
-                                                src="{{ Storage::url($media->path) }}" 
-                                                alt="Tweet media"
-                                                class="rounded-xl w-full h-auto object-cover max-h-96 hover:scale-105 transition-transform duration-300 cursor-pointer"
-                                            >
+                                <!-- Post Actions -->
+                                <div class="p-4 space-y-4">
+                                    <!-- Like, Comment, Share Buttons -->
+                                    <div class="flex gap-4">
+                                        @auth
+                                            <form action="{{ route('likes.toggle', $tweet) }}" method="POST" class="group">
+                                                @csrf
+                                                <button type="submit" class="hover:text-gray-500 transition">
+                                                    @if ($tweet->isLikedBy(auth()->user()))
+                                                        <svg class="w-6 h-6 fill-red-500" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg>
+                                                    @else
+                                                        <svg class="w-6 h-6 hover:fill-gray-300" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                                                    @endif
+                                                </button>
+                                            </form>
                                         @else
-                                            <video 
-                                                controls 
-                                                class="rounded-xl w-full h-auto max-h-96 bg-black"
-                                            >
-                                                <source src="{{ Storage::url($media->path) }}" type="video/mp4">
-                                                Your browser does not support the video tag.
-                                            </video>
-                                        @endif
-                                    @endforeach
+                                            <a href="{{ route('login') }}" class="hover:text-gray-500 transition">
+                                                <svg class="w-6 h-6" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                                            </a>
+                                        @endauth
+
+                                        <a href="{{ route('profile.show', $tweet->user) }}" class="text-gray-900 hover:text-gray-500 transition">
+                                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 12H6v-2h14v2zm0-3H6V9h14v2zm0-3H6V6h14v2z"></path></svg>
+                                        </a>
+
+                                        <button class="text-gray-900 hover:text-gray-500 transition">
+                                            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"></path></svg>
+                                        </button>
+                                    </div>
+
+                                    <!-- Like Count -->
+                                    <p class="font-bold text-gray-900">{{ $tweet->likes_count }} {{ Str::plural('like', $tweet->likes_count) }}</p>
+
+                                    <!-- Caption -->
+                                    <div>
+                                        <p class="text-gray-900">
+                                            <a href="{{ route('profile.show', $tweet->user) }}" class="font-bold hover:text-blue-600">{{ $tweet->user->name }}</a>
+                                            <span class="ml-2">{{ $tweet->content }}</span>
+                                        </p>
+                                    </div>
+
+                                    <!-- Timestamp -->
+                                    <p class="text-xs text-gray-500 uppercase">{{ $tweet->created_at->diffForHumans() }}</p>
+                                </div>
+                            </div>
+                        @endforeach
+                    @endif
+                </div>
+            </div>
+
+            <!-- Right Sidebar (Suggested Users) - Desktop Only -->
+            <div class="hidden xl:block w-80 bg-white border-l border-gray-200 p-6">
+                <!-- Search Bar -->
+                <div class="mb-6">
+                    <form action="{{ route('search.index') }}" method="GET" class="relative">
+                        <input 
+                            type="text" 
+                            name="q"
+                            placeholder="Search..."
+                            class="w-full bg-gray-100 border-0 rounded-full py-2 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+                        >
+                    </form>
+                </div>
+
+                <!-- Suggested For You -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-gray-900">Suggested for you</h3>
+                        <a href="{{ route('search.index') }}" class="text-blue-600 text-sm hover:text-blue-700">See All</a>
+                    </div>
+
+                    <div class="space-y-4">
+                        @php
+                            $suggestedForYou = \App\Models\User::inRandomOrder()
+                                ->where('id', '!=', auth()->id() ?? 0)
+                                ->limit(10)
+                                ->get();
+                        @endphp
+                        @foreach($suggestedForYou->take(5) as $user)
+                            @if(!auth()->check() || auth()->user()->id !== $user->id && !auth()->user()->isFollowing($user))
+                                <div class="flex items-center justify-between">
+                                    <a href="{{ route('profile.show', $user) }}" class="flex items-center gap-2 flex-1">
+                                        <div class="w-8 h-8 rounded-full bg-gradient-to-br {{ $user->getAvatarColors() }} flex items-center justify-center text-white font-bold text-xs">
+                                            {{ strtoupper(substr($user->name, 0, 1)) }}
+                                        </div>
+                                        <div class="flex-1">
+                                            <p class="font-bold text-sm text-gray-900">{{ $user->name }}</p>
+                                            <p class="text-xs text-gray-500">Popular</p>
+                                        </div>
+                                    </a>
+
+                                    @auth
+                                        <form action="{{ route('follow.store', $user) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="text-blue-600 font-bold text-sm hover:text-blue-700">Follow</button>
+                                        </form>
+                                    @else
+                                        <a href="{{ route('login') }}" class="text-blue-600 font-bold text-sm hover:text-blue-700">Follow</a>
+                                    @endauth
                                 </div>
                             @endif
+                        @endforeach
+                    </div>
+                </div>
 
-                            <div class="flex items-center gap-8 text-gray-500 border-t border-gray-200 pt-4">
-                                @auth
-                                    <!-- Like Button -->
-                                    <form action="{{ route('likes.toggle', $tweet) }}" method="POST" class="flex items-center gap-3 group/like cursor-pointer">
-                                        @csrf
-                                        <button type="submit" class="relative group-hover/like:scale-125 transition-all duration-300 transform">
-                                            @if ($tweet->isLikedBy(auth()->user()))
-                                                <span class="text-3xl animate-heartBeat">❤️</span>
-                                            @else
-                                                <span class="text-3xl group-hover/like:text-red-500 transition-colors duration-300">🤍</span>
-                                            @endif
-                                            <span class="absolute inset-0 rounded-full bg-red-400 opacity-0 group-hover/like:opacity-20 group-hover/like:scale-150 transition-all duration-500"></span>
-                                        </button>
-                                        <span class="font-bold text-lg text-gray-700 group-hover/like:text-red-500 group-hover/like:scale-110 transition-all duration-300">
-                                            {{ $tweet->likes_count }}
-                                        </span>
-                                    </form>
-                                @else
-                                    <div class="flex items-center gap-3 cursor-not-allowed opacity-60">
-                                        <span class="text-3xl">🤍</span>
-                                        <span class="font-bold text-lg text-gray-700">{{ $tweet->likes_count }}</span>
-                                    </div>
-                                @endauth
-                            </div>
-
-                        </div>
-                    @endforeach
-                @endif
+                <!-- Footer Links -->
+                <div class="mt-8 text-xs text-gray-500 space-y-2">
+                    <p>About • Help • Press • API • Jobs • Privacy • Terms • Locations • Language</p>
+                    <p>© 2025 Chirper from Tacus</p>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Character counter
-        document.querySelector('textarea')?.addEventListener('input', function() {
-            const count = this.value.length;
-            const counter = document.querySelector('.char-count');
-            counter.textContent = count;
-            
-            // Color change based on character count
-            if (count > 250) {
-                counter.classList.add('text-red-600');
-                counter.classList.remove('text-purple-600');
-            } else {
-                counter.classList.add('text-purple-600');
-                counter.classList.remove('text-red-600');
-            }
-        });
-
-        // Media preview
-        const mediaInput = document.getElementById('mediaInput');
-        if (mediaInput) {
-            mediaInput.addEventListener('change', function(e) {
-                const preview = document.getElementById('mediaPreview');
-                preview.innerHTML = '';
-                
-                if (this.files.length > 0) {
-                    const file = this.files[0];
-                    const reader = new FileReader();
-                    
-                    reader.onload = function(event) {
-                        if (file.type.startsWith('image/')) {
-                            preview.innerHTML = `
-                                <div class="relative">
-                                    <img src="${event.target.result}" class="max-h-48 rounded-lg">
-                                    <button type="button" onclick="document.getElementById('mediaInput').value=''; this.parentElement.parentElement.innerHTML='';" class="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full">✕</button>
-                                </div>
-                            `;
-                        } else if (file.type.startsWith('video/')) {
-                            preview.innerHTML = `
-                                <div class="relative">
-                                    <video class="max-h-48 rounded-lg" controls>
-                                        <source src="${event.target.result}">
-                                    </video>
-                                    <button type="button" onclick="document.getElementById('mediaInput').value=''; this.parentElement.parentElement.innerHTML='';" class="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full">✕</button>
-                                </div>
-                            `;
-                        }
-                    };
-                    
-                    reader.readAsDataURL(file);
-                }
-            });
+        function toggleMenu(id) {
+            const menu = document.getElementById(id);
+            menu.classList.toggle('hidden');
         }
 
-        // Add stagger animation to tweets
-        document.querySelectorAll('.animate-fadeInUp').forEach((el, index) => {
-            el.style.animationDelay = `${index * 0.1}s`;
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('[id^="menu-"]') && !event.target.closest('button[onclick*="toggleMenu"]')) {
+                document.querySelectorAll('[id^="menu-"]').forEach(el => {
+                    if (!el.classList.contains('hidden')) {
+                        el.classList.add('hidden');
+                    }
+                });
+            }
         });
     </script>
 
     <style>
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        /* Smooth transitions */
+        * {
+            transition: background-color 0.2s, color 0.2s;
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes blob {
-            0%, 100% {
-                transform: translate(0, 0) scale(1);
-            }
-            25% {
-                transform: translate(20px, -50px) scale(1.1);
-            }
-            50% {
-                transform: translate(-20px, 20px) scale(0.9);
-            }
-            75% {
-                transform: translate(50px, 50px) scale(1.05);
-            }
-        }
-
-        @keyframes heartBeat {
-            0%, 100% {
-                transform: scale(1);
-            }
-            10%, 30% {
-                transform: scale(1.2);
-            }
-            20%, 40% {
-                transform: scale(1.1);
-            }
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-            20%, 40%, 60%, 80% { transform: translateX(5px); }
-        }
-
-        .animate-fadeInDown {
-            animation: fadeInDown 0.6s ease-out forwards;
-        }
-
-        .animate-fadeInUp {
-            animation: fadeInUp 0.6s ease-out forwards;
-            opacity: 0;
-        }
-
-        .animate-blob {
-            animation: blob 7s infinite;
-        }
-
-        .animate-heartBeat {
-            animation: heartBeat 1s ease-in-out;
-        }
-
-        .animate-shake {
-            animation: shake 0.5s ease-in-out;
-        }
-
-        .animation-delay-2000 {
-            animation-delay: 2s;
-        }
-
-        .animation-delay-4000 {
-            animation-delay: 4s;
-        }
-
-        .shadow-3xl {
-            box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Smooth scrolling */
-        html {
-            scroll-behavior: smooth;
+        /* Story circle glow on hover */
+        .group:hover {
+            opacity: 0.7;
         }
 
         /* Custom scrollbar */
         ::-webkit-scrollbar {
-            width: 10px;
+            width: 8px;
         }
 
         ::-webkit-scrollbar-track {
-            background: linear-gradient(to bottom, #e0e7ff, #fce7f3);
+            background: #f1f1f1;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: linear-gradient(to bottom, #8b5cf6, #ec4899);
-            border-radius: 10px;
+            background: #888;
+            border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(to bottom, #7c3aed, #db2777);
+            background: #555;
         }
     </style>
 </x-app-layout>
