@@ -9,6 +9,7 @@ use App\Http\Controllers\FollowController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\MediaController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -50,6 +51,10 @@ Route::middleware('auth')->group(function () {
     // 5. Follow/Unfollow Routes
     Route::post('/users/{user}/follow', [FollowController::class, 'store'])->name('follow.store');
     Route::delete('/users/{user}/follow', [FollowController::class, 'destroy'])->name('follow.destroy');
+
+    // 5b. Notifications Routes
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'read'])->name('notifications.read');
 
     // 6. Media Upload Routes
     Route::post('/tweets/{tweet}/media', [MediaController::class, 'store'])->name('media.store');

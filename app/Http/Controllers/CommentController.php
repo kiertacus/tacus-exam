@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Comment;
 use App\Models\Tweet;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 
@@ -23,10 +24,21 @@ class CommentController extends Controller
             'content' => ['required', 'string', 'max:500'],
         ]);
 
-        $tweet->comments()->create([
+        $comment = $tweet->comments()->create([
             'user_id' => $request->user()->id,
             'content' => $validated['content'],
         ]);
+
+        // Create notification if commenter is not the tweet author
+        if ($request->user()->id !== $tweet->user_id) {
+            Notification::create([
+                'user_id' => $tweet->user_id,
+                'from_user_id' => $request->user()->id,
+                'type' => 'comment',
+                'tweet_id' => $tweet->id,
+                'message' => $request->user()->name . ' commented on your post',
+            ]);
+        }
 
         return redirect()->route('tweets.index')->with('status', 'Comment added successfully!');
     }

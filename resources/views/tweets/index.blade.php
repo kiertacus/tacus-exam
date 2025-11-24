@@ -29,6 +29,19 @@
                         <span class="hidden xl:block">Messages</span>
                     </a>
 
+                    @auth
+                        <a href="{{ route('notifications.index') }}" class="relative flex items-center gap-4 px-4 py-3 rounded-full text-2xl {{ request()->routeIs('notifications.*') ? 'font-bold' : 'text-gray-700 hover:bg-gray-100' }}">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"></path></svg>
+                            <span class="hidden xl:block">Notifications</span>
+                            @php
+                                $unreadCount = auth()->user()->getUnreadNotificationsCount();
+                            @endphp
+                            @if($unreadCount > 0)
+                                <span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">{{ $unreadCount }}</span>
+                            @endif
+                        </a>
+                    @endauth
+
                     <a href="{{ route('profile.edit') }}" class="flex items-center gap-4 px-4 py-3 rounded-full text-2xl text-gray-700 hover:bg-gray-100">
                         <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg>
                         <span class="hidden xl:block">Profile</span>

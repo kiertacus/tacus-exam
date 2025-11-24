@@ -153,4 +153,20 @@ class User extends Authenticatable
                     ->where('follower_id', $this->id);
             });
         }
+
+        /**
+         * Relationship: A user can have many notifications
+         */
+        public function notifications()
+        {
+            return $this->hasMany(Notification::class);
+        }
+
+        /**
+         * Get unread notifications count
+         */
+        public function getUnreadNotificationsCount()
+        {
+            return $this->notifications()->where('read', false)->count();
+        }
 }
