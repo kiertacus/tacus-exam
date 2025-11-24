@@ -158,55 +158,14 @@
                                             {{ $tweet->likes_count }}
                                         </span>
                                     </form>
-
-                                    <!-- Comment Button -->
-                                    <button onclick="toggleComments('comments-{{ $tweet->id }}')" class="flex items-center gap-3 cursor-pointer hover:text-blue-500 transition-colors duration-300 group/comment">
-                                        <span class="text-2xl group-hover/comment:scale-110 transition-transform">💬</span>
-                                        <span class="font-semibold">Comment</span>
-                                    </button>
-
-                                    <!-- Share Button -->
-                                    <button onclick="shareModal('share-{{ $tweet->id }}')" class="flex items-center gap-3 cursor-pointer hover:text-green-500 transition-colors duration-300 group/share ml-auto">
-                                        <span class="text-2xl group-hover/share:scale-110 group-hover/share:rotate-12 transition-all">🔄</span>
-                                        <span class="font-semibold">Share</span>
-                                    </button>
                                 @else
                                     <div class="flex items-center gap-3 cursor-not-allowed opacity-60">
                                         <span class="text-3xl">🤍</span>
                                         <span class="font-bold text-lg text-gray-700">{{ $tweet->likes_count }}</span>
                                     </div>
-                                    <div class="flex items-center gap-3 cursor-not-allowed opacity-60">
-                                        <span class="text-2xl">💬</span>
-                                        <span class="font-semibold">Comment</span>
-                                    </div>
-                                    <div class="flex items-center gap-3 cursor-not-allowed opacity-60 ml-auto">
-                                        <span class="text-2xl">🔄</span>
-                                        <span class="font-semibold">Share</span>
-                                    </div>
                                 @endauth
                             </div>
 
-                            @auth
-                            @endauth
-                                            </button>
-                                            <button onclick="shareVia('twitter', '{{ $tweet->content }}')" class="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 rounded-2xl transition-all duration-300 group">
-                                                <span class="text-3xl group-hover:scale-110 transition-transform">🐦</span>
-                                                <div class="text-left">
-                                                    <p class="font-bold text-gray-800">Share on Twitter</p>
-                                                    <p class="text-xs text-gray-600">Post to your timeline</p>
-                                                </div>
-                                            </button>
-                                            <button onclick="shareVia('facebook', '{{ $tweet->content }}')" class="w-full flex items-center gap-4 p-4 bg-gradient-to-r from-indigo-50 to-indigo-100 hover:from-indigo-100 hover:to-indigo-200 rounded-2xl transition-all duration-300 group">
-                                                <span class="text-3xl group-hover:scale-110 transition-transform">📘</span>
-                                                <div class="text-left">
-                                                    <p class="font-bold text-gray-800">Share on Facebook</p>
-                                                    <p class="text-xs text-gray-600">Post to your feed</p>
-                                                </div>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endauth
                         </div>
                     @endforeach
                 @endif
