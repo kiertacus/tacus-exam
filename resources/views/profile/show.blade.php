@@ -9,11 +9,18 @@
                     </div>
                     <div class="flex-1">
                         <h1 class="text-4xl font-bold text-black">{{ $user->name }}</h1>
-                        <div class="mt-4 flex gap-6">
+                        <div class="mt-4 flex gap-6 items-center">
                             <div class="text-center">
                                 <p class="text-3xl font-bold text-blue-600">{{ $tweets->count() }}</p>
                                 <p class="text-gray-600 text-sm">Tweets</p>
                             </div>
+                            @auth
+                                @if(auth()->user()->id !== $user->id)
+                                    <a href="{{ route('messages.show', $user) }}" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-bold py-2 px-6 rounded-full transition-all transform hover:scale-105">
+                                        💬 Message
+                                    </a>
+                                @endif
+                            @endauth
                         </div>
                     </div>
                 </div>

@@ -80,4 +80,20 @@ class User extends Authenticatable
             
             return $avatars[$this->avatar] ?? $avatars['blue'];
         }
+
+        /**
+         * Relationship: A user can send many Messages
+         */
+        public function sentMessages()
+        {
+            return $this->hasMany(Message::class, 'sender_id');
+        }
+
+        /**
+         * Relationship: A user can receive many Messages
+         */
+        public function receivedMessages()
+        {
+            return $this->hasMany(Message::class, 'recipient_id');
+        }
 }

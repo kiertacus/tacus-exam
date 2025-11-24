@@ -15,6 +15,11 @@
                     <x-nav-link :href="route('tweets.index')" :active="request()->routeIs('tweets.index')">
                         {{ __('Feed') }}
                     </x-nav-link>
+                    @auth
+                        <x-nav-link :href="route('messages.conversations')" :active="request()->routeIs('messages.*')">
+                            {{ __('Messages') }}
+                        </x-nav-link>
+                    @endauth
                 </div>
             </div>
 

@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TweetController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\MessageController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -30,6 +31,11 @@ Route::middleware('auth')->group(function () {
 
     // 3. User Profile Route (View your own profile, can be extended for others)
     Route::get('/profile/{user}', [UserController::class, 'show'])->name('profile.show');
+
+    // 4. Messaging Routes
+    Route::get('/messages', [MessageController::class, 'conversations'])->name('messages.conversations');
+    Route::get('/messages/{user}', [MessageController::class, 'show'])->name('messages.show');
+    Route::post('/messages/{user}', [MessageController::class, 'store'])->name('messages.store');
 });
 
 
