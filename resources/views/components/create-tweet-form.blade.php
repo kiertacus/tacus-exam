@@ -1,4 +1,4 @@
-<div class="bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl p-8 mb-8 border border-white/50 hover:shadow-3xl transition-all duration-500 animate-fadeInDown">
+<div class="bg-gray-900/90 backdrop-blur-lg rounded-3xl shadow-2xl p-8 mb-8 border border-white/50 hover:shadow-3xl transition-all duration-500 animate-fadeInDown">
     <div class="flex items-center gap-3 mb-6">
         <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center transform rotate-6 hover:rotate-12 transition-transform duration-300">
             <span class="text-2xl">✨</span>
@@ -34,12 +34,12 @@
             </div>
 
             <!-- Media Upload Section -->
-            <div class="mt-4 p-4 bg-gray-50 border-2 border-dashed border-gray-300 rounded-2xl">
-                <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-100 p-3 rounded-xl transition">
+            <div class="mt-4 p-4 bg-gray-50 border-2 border-dashed border-gray-700 rounded-2xl">
+                <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-800 p-3 rounded-xl transition">
                     <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                     </svg>
-                    <span class="text-gray-700 font-medium">Add image or video</span>
+                    <span class="text-gray-300 font-medium">Add image or video</span>
                     <input 
                         type="file" 
                         name="media" 
@@ -65,13 +65,13 @@
                         <span>Tweet</span>
                         <span class="group-hover:translate-x-1 transition-transform">🚀</span>
                     </span>
-                    <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                    <div class="absolute inset-0 bg-gray-900/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                 </button>
             </div>
         </form>
     @else
         <div class="text-center py-8 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl">
-            <p class="text-gray-700 text-lg font-medium mb-4">Join the conversation! 🎉</p>
+            <p class="text-gray-300 text-lg font-medium mb-4">Join the conversation! 🎉</p>
             <div class="flex gap-4 justify-center">
                 <a href="{{ route('login') }}" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold py-2 px-6 rounded-full hover:scale-105 transition-transform shadow-lg">Login</a>
                 <a href="{{ route('register') }}" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-2 px-6 rounded-full hover:scale-105 transition-transform shadow-lg">Register</a>
@@ -79,3 +79,4 @@
         </div>
     @endauth
 </div>
+

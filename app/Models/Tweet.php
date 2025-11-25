@@ -45,9 +45,33 @@ class Tweet extends Model
         return $this->belongsToMany(Hashtag::class, 'hashtag_tweet');
     }
 
+    // Relationship: A tweet can have many retweets
+    public function retweets()
+    {
+        return $this->hasMany(Retweet::class);
+    }
+
+    // Relationship: A tweet can have many bookmarks
+    public function bookmarks()
+    {
+        return $this->hasMany(Bookmark::class);
+    }
+
     // Helper: Check if the current user has liked this tweet
     public function isLikedBy(User $user)
     {
         return $this->likes()->where('user_id', $user->id)->exists();
+    }
+
+    // Helper: Check if the current user has retweeted this tweet
+    public function isRetweetedBy(User $user)
+    {
+        return $this->retweets()->where('user_id', $user->id)->exists();
+    }
+
+    // Helper: Check if the current user has bookmarked this tweet
+    public function isBookmarkedBy(User $user)
+    {
+        return $this->bookmarks()->where('user_id', $user->id)->exists();
     }
 }

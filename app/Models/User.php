@@ -22,6 +22,10 @@ class User extends Authenticatable
         'email',
         'password',
         'avatar',
+        'bio',
+        'location',
+        'website',
+        'is_verified',
     ];
 
     /**
@@ -169,4 +173,48 @@ class User extends Authenticatable
         {
             return $this->notifications()->where('read', false)->count();
         }
+
+        /**
+         * Relationship: A user can have many stories
+         */
+        public function stories()
+        {
+            return $this->hasMany(Story::class);
+        }
+
+        /**
+         * Relationship: A user can have a profile picture
+         */
+        public function profilePicture()
+        {
+            return $this->hasOne(ProfilePicture::class);
+        }
+
+        /**
+         * Get active stories (not expired)
+         */
+        public function getActiveStories()
+        {
+            return $this->stories()
+                ->where('expires_at', '>', now())
+                ->latest()
+                ->get();
+        }
+
+        /**
+         * Relationship: A user can have many bookmarks
+         */
+        public function bookmarks()
+        {
+            return $this->hasMany(Bookmark::class);
+        }
+
+        /**
+         * Relationship: A user can have many retweets
+         */
+        public function retweets()
+        {
+            return $this->hasMany(Retweet::class);
+        }
 }
+

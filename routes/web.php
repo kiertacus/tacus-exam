@@ -11,6 +11,11 @@ use App\Http\Controllers\MediaController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\HashtagController;
+use App\Http\Controllers\StoryController;
+use App\Http\Controllers\CallController;
+use App\Http\Controllers\ProfilePictureController;
+use App\Http\Controllers\RetweetController;
+use App\Http\Controllers\BookmarkController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,7 +45,16 @@ Route::middleware('auth')->group(function () {
     // This route handles both liking and unliking by using the toggle method
     Route::post('/tweets/{tweet}/like', [LikeController::class, 'toggle'])->name('likes.toggle');
 
-    // 2b. Comment Routes
+    // 2b. Retweet Routes
+    Route::post('/tweets/{tweet}/retweet', [RetweetController::class, 'store'])->name('retweets.store');
+    Route::delete('/tweets/{tweet}/retweet', [RetweetController::class, 'destroy'])->name('retweets.destroy');
+
+    // 2c. Bookmark Routes
+    Route::post('/tweets/{tweet}/bookmark', [BookmarkController::class, 'store'])->name('bookmarks.store');
+    Route::delete('/tweets/{tweet}/bookmark', [BookmarkController::class, 'destroy'])->name('bookmarks.destroy');
+    Route::get('/bookmarks', [BookmarkController::class, 'index'])->name('bookmarks.index');
+
+    // 2d. Comment Routes
     Route::post('/tweets/{tweet}/comments', [CommentController::class, 'store'])->name('comments.store');
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
 
@@ -63,6 +77,19 @@ Route::middleware('auth')->group(function () {
     // 6. Media Upload Routes
     Route::post('/tweets/{tweet}/media', [MediaController::class, 'store'])->name('media.store');
     Route::delete('/media/{media}', [MediaController::class, 'destroy'])->name('media.destroy');
+
+    // 7. Story Routes
+    Route::post('/stories', [StoryController::class, 'store'])->name('stories.store');
+    Route::delete('/stories/{story}', [StoryController::class, 'destroy'])->name('stories.destroy');
+
+    // 8. Call Routes (Voice & Video)
+    Route::post('/calls/initiate', [CallController::class, 'initiate'])->name('calls.initiate');
+    Route::post('/calls/{message}/end', [CallController::class, 'end'])->name('calls.end');
+    Route::post('/calls/{message}/decline', [CallController::class, 'decline'])->name('calls.decline');
+
+    // 9. Profile Picture Routes
+    Route::post('/profile-picture', [ProfilePictureController::class, 'store'])->name('profile-picture.store');
+    Route::delete('/profile-picture', [ProfilePictureController::class, 'destroy'])->name('profile-picture.destroy');
 });
 
 
@@ -73,5 +100,8 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+// --- API Routes for AJAX Requests ---
+Route::get('/api/stories/{user}', [StoryController::class, 'getUserStories']);
 
 require __DIR__.'/auth.php';
